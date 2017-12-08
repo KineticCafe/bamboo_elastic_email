@@ -1,0 +1,4 @@
+Unknown function 'Elixir.Plug.Conn.Query':decode/1
+Unknown function 'Elixir.Plug.Conn.Query':encode/1
+Unknown function hackney:post/4
+Callback info about the 'Elixir.Bamboo.Adapter' behaviour is not available
