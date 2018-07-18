@@ -6,7 +6,7 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
 
 ## Installation
 
-1.  Add `bamboo_elastic_email` to your `mix.exs`:
+1. Add `bamboo_elastic_email` to your `mix.exs`:
 
     ```elixir
     def deps do
@@ -18,7 +18,7 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
     end
     ```
 
-2.  If using Elixir before 1.4, or if you are managing all applications
+2. If using Elixir before 1.4, or if you are managing all applications
     yourself, ensure that `bamboo` is started before your application:
 
     ```elixir
@@ -27,7 +27,7 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
     end
     ```
 
-3.  Add your Elastic Email API key to your config:
+3. Add your Elastic Email API key to your config:
 
     ```elixir
     # In your config/config.exs file
@@ -36,7 +36,13 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
       api_key: "my-api-key"
     ```
 
-4.  Follow the Bamboo [Getting Started Guide][getting_started].
+4. Follow the Bamboo [Getting Started Guide][getting_started].
+
+5. To use ElasticEmails [postBack] functionality you can place a value in the `Email#private` parameter:
+
+    ```elixir
+    Email.put_private(email, :elastic_custom_vars, %{post_back: "your-post-back-value"})
+    ```
 
 ## Community and Contributing
 
@@ -53,3 +59,4 @@ Kinetic Cafe [open source projects][], is under the Kinetic Cafe Open Source
 [Contributing.md]: Contributing.md
 [open source projects]: https://github.com/KineticCafe
 [kccoc]: https://github.com/KineticCafe/code-of-conduct
+[postBack]: https://api.elasticemail.com/public/help#Email_Send 
