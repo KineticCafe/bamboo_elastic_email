@@ -136,19 +136,19 @@ defmodule Bamboo.ElasticEmailAdapter do
   defp to_elastic_body(%Email{} = email, api_key) do
     email
     |> Map.from_struct()
-    |> put_from
-    |> put_to
-    |> put_cc
-    |> put_bcc
-    |> put_html_body
-    |> put_text_body
-    |> put_charset
+    |> put_from()
+    |> put_to()
+    |> put_cc()
+    |> put_bcc()
+    |> put_html_body()
+    |> put_text_body()
+    |> put_charset()
     |> put_headers(email)
     |> put_api_key(api_key)
-    |> put_post_back
-    |> put_transactional
-    |> transform_fields
-    |> filter_fields
+    |> put_post_back()
+    |> put_transactional()
+    |> transform_fields()
+    |> filter_fields()
   end
 
   defp put_from(%{from: {nil, email}} = map), do: Map.put(map, "from", email)
@@ -197,7 +197,9 @@ defmodule Bamboo.ElasticEmailAdapter do
 
   defp put_transactional(map), do: Map.put(map, "isTransactional", true)
 
-  defp put_post_back(%{post_back: post_back} = map), do: Map.put(map, "postBack", post_back)
+  defp put_post_back(%{private: %{elastic_custom_vars: %{post_back: post_back}}} = map),
+    do: Map.put(map, "postBack", post_back)
+
   defp put_post_back(map), do: map
 
   defp put_headers(body, %Email{headers: headers}) do

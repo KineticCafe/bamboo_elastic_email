@@ -138,6 +138,7 @@ defmodule Bamboo.ElasticEmailAdapterTest do
       ElasticEmailAdapter.deliver(new_email(), @config)
 
       assert_receive {:fake_elastic_email, %{params: params}}
+
       assert params["isTransactional"] == "true"
     end
 
@@ -155,6 +156,16 @@ defmodule Bamboo.ElasticEmailAdapterTest do
       assert_raise Bamboo.ElasticEmailAdapter.ApiError, ~r/"apikey" => "\[FILTERED\]"/, fn ->
         ElasticEmailAdapter.deliver(email, @config)
       end
+    end
+
+    test "deliver/2 adds custom elastic fields from email to the message" do
+      email = new_email() |> Email.put_private(:elastic_custom_vars, %{post_back: "12345"})
+
+      ElasticEmailAdapter.deliver(email, @config)
+
+      assert_receive {:fake_elastic_email, %{params: params}}
+
+      assert params["postBack"] == "12345"
     end
 
     defp new_email(attrs \\ []) do
