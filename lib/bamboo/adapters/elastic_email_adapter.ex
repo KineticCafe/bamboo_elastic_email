@@ -145,15 +145,14 @@ defmodule Bamboo.ElasticEmailAdapter do
     |> put_charset
     |> put_headers(email)
     |> put_api_key(api_key)
+    |> put_post_back
     |> put_transactional
     |> transform_fields
     |> filter_fields
   end
 
   defp put_from(%{from: {nil, email}} = map), do: Map.put(map, "from", email)
-
   defp put_from(%{from: {"", email}} = map), do: Map.put(map, "from", email)
-
   defp put_from(%{from: {name, email}} = map) do
     map
     |> Map.put("fromName", name)
@@ -161,31 +160,19 @@ defmodule Bamboo.ElasticEmailAdapter do
   end
 
   defp put_from(%{from: email} = map), do: Map.put(map, "from", email)
-
   defp put_from(map), do: map
 
-  defp put_to(%{to: email} = map) do
-    Map.put(map, "msgTo", combine_name_and_email(email))
-  end
-
+  defp put_to(%{to: email} = map), do: Map.put(map, "msgTo", combine_name_and_email(email))
   defp put_to(map), do: map
 
-  defp put_cc(%{cc: email} = map) do
-    Map.put(map, "msgCc", combine_name_and_email(email))
-  end
-
+  defp put_cc(%{cc: email} = map), do: Map.put(map, "msgCc", combine_name_and_email(email))
   defp put_cc(map), do: map
 
-  defp put_bcc(%{bcc: email} = map) do
-    Map.put(map, "msgBcc", combine_name_and_email(email))
-  end
-
+  defp put_bcc(%{bcc: email} = map), do: Map.put(map, "msgBcc", combine_name_and_email(email))
   defp put_bcc(map), do: map
 
   defp put_reply_to(map, {nil, email}), do: Map.put(map, "replyTo", email)
-
   defp put_reply_to(map, {"", email}), do: Map.put(map, "replyTo", email)
-
   defp put_reply_to(map, {name, email}) do
     map
     |> Map.put("replyToName", name)
@@ -193,28 +180,23 @@ defmodule Bamboo.ElasticEmailAdapter do
   end
 
   defp put_reply_to(map, nil), do: map
-
   defp put_reply_to(map, ""), do: map
-
   defp put_reply_to(map, email), do: Map.put(map, "replyTo", email)
 
   defp put_api_key(body, api_key), do: Map.put(body, "apikey", api_key)
 
-  defp put_html_body(%{html_body: html_body} = map) do
-    Map.put(map, "bodyHtml", html_body)
-  end
-
+  defp put_html_body(%{html_body: html_body} = map), do: Map.put(map, "bodyHtml", html_body)
   defp put_html_body(map), do: map
 
-  defp put_text_body(%{text_body: text_body} = map) do
-    Map.put(map, "bodyText", text_body)
-  end
-
+  defp put_text_body(%{text_body: text_body} = map), do: Map.put(map, "bodyText", text_body)
   defp put_text_body(map), do: map
 
   defp put_charset(map), do: Map.put(map, "charset", "utf-8")
 
   defp put_transactional(map), do: Map.put(map, "isTransactional", true)
+
+  defp put_post_back(%{post_back: post_back} = map), do: Map.put(map, "postBack", post_back)
+  defp put_post_back(map), do: map
 
   defp put_headers(body, %Email{headers: headers}) do
     Enum.reduce(headers, body, fn {key, value}, acc ->
@@ -247,6 +229,7 @@ defmodule Bamboo.ElasticEmailAdapter do
     :apikey,
     :charset,
     :isTransactional,
+    :postBack,
     :replyTo,
     :replyToName
   ]
