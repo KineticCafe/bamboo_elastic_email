@@ -153,6 +153,7 @@ defmodule Bamboo.ElasticEmailAdapter do
 
   defp put_from(%{from: {nil, email}} = map), do: Map.put(map, "from", email)
   defp put_from(%{from: {"", email}} = map), do: Map.put(map, "from", email)
+
   defp put_from(%{from: {name, email}} = map) do
     map
     |> Map.put("fromName", name)
@@ -173,6 +174,7 @@ defmodule Bamboo.ElasticEmailAdapter do
 
   defp put_reply_to(map, {nil, email}), do: Map.put(map, "replyTo", email)
   defp put_reply_to(map, {"", email}), do: Map.put(map, "replyTo", email)
+
   defp put_reply_to(map, {name, email}) do
     map
     |> Map.put("replyToName", name)
