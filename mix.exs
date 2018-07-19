@@ -53,7 +53,7 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
 
   defp deps do
     [
-      {:bamboo, "~> 1.0"},
+      {:bamboo, ">= 0.8.0 or < 2.0.0"},
       {:plug, "~> 1.0"},
       {:hackney, "~> 1.6"},
       {:cowboy, "~> 1.0", only: [:dev, :test]},
