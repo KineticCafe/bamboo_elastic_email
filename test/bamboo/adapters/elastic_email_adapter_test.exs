@@ -1,7 +1,9 @@
 defmodule Bamboo.ElasticEmailAdapterTest do
   use ExUnit.Case
-  alias Bamboo.Email
   alias Bamboo.ElasticEmailAdapter
+  alias Bamboo.Email
+  alias Bamboo.Mailer
+  alias Plug.Adapters.Cowboy
   alias Plug.Conn
 
   @config %{adapter: ElasticEmailAdapter, api_key: "123_abc"}
@@ -24,7 +26,7 @@ defmodule Bamboo.ElasticEmailAdapterTest do
       port = get_free_port()
 
       Application.put_env(:bamboo, :elastic_email_base_uri, "http://localhost:#{port}")
-      Plug.Adapters.Cowboy.http(__MODULE__, [], port: port, ref: __MODULE__)
+      Cowboy.http(__MODULE__, [], port: port, ref: __MODULE__)
     end
 
     def get_free_port do
@@ -35,7 +37,7 @@ defmodule Bamboo.ElasticEmailAdapterTest do
     end
 
     def shutdown do
-      Plug.Adapters.Cowboy.shutdown(__MODULE__)
+      Cowboy.shutdown(__MODULE__)
     end
 
     post "/email/send" do
@@ -138,6 +140,7 @@ defmodule Bamboo.ElasticEmailAdapterTest do
       ElasticEmailAdapter.deliver(new_email(), @config)
 
       assert_receive {:fake_elastic_email, %{params: params}}
+
       assert params["isTransactional"] == "true"
     end
 
@@ -157,11 +160,21 @@ defmodule Bamboo.ElasticEmailAdapterTest do
       end
     end
 
+    test "deliver/2 adds custom elastic fields from email to the message" do
+      email = Email.put_private(new_email(), :elastic_custom_vars, %{post_back: "12345"})
+
+      ElasticEmailAdapter.deliver(email, @config)
+
+      assert_receive {:fake_elastic_email, %{params: params}}
+
+      assert params["postBack"] == "12345"
+    end
+
     defp new_email(attrs \\ []) do
       [from: "foo@bar.com", to: []]
       |> Keyword.merge(attrs)
       |> Email.new_email()
-      |> Bamboo.Mailer.normalize_addresses()
+      |> Mailer.normalize_addresses()
     end
   end
 end

@@ -2,7 +2,7 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
   use Mix.Project
 
   @project_url "https://github.com/KineticCafe/bamboo_elastic_email"
-  @version "0.1.0"
+  @version "0.2.0"
 
   def project do
     [
@@ -53,7 +53,7 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
 
   defp deps do
     [
-      {:bamboo, "~> 0.8.0"},
+      {:bamboo, "~> 1.0"},
       {:plug, "~> 1.0"},
       {:hackney, "~> 1.6"},
       {:cowboy, "~> 1.0", only: [:dev, :test]},
