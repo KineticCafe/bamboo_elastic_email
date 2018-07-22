@@ -6,7 +6,7 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
 
 ## Installation
 
-1.  Add `bamboo_elastic_email` to your `mix.exs`:
+1.  Add `bamboo` and `bamboo_elastic_email` to your `mix.exs`:
 
     ```elixir
     def deps do
