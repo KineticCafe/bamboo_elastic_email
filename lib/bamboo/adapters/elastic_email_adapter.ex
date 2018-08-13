@@ -145,7 +145,7 @@ defmodule Bamboo.ElasticEmailAdapter do
     |> put_charset()
     |> put_headers(email)
     |> put_api_key(api_key)
-    |> put_custom_vars()
+    |> put_elastic_send_options()
     |> put_transactional()
     |> transform_fields()
     |> filter_fields()
@@ -197,42 +197,50 @@ defmodule Bamboo.ElasticEmailAdapter do
 
   defp put_transactional(map), do: Map.put(map, "isTransactional", true)
 
-  defp put_custom_vars(%{private: %{elastic_custom_vars: custom_vars}} = map) do
-    custom_vars
-    |> Enum.map(&custom_var(&1))
-    |> Enum.reject(&is_nil/1)
-    |> Enum.reduce(%{}, fn var, acc -> Map.merge(acc, var) end)
-    |> Map.merge(map)
+  defp put_elastic_send_options(%{private: %{elastic_custom_vars: options} = private} = email) do
+    private =
+      private
+      |> Map.delete(:elastic_custom_vars)
+      |> Map.put(:elastic_send_options, options)
+
+    put_elastic_send_options(%{email | private: private})
   end
 
-  defp put_custom_vars(map), do: map
+  defp put_elastic_send_options(%{private: %{elastic_send_options: options}} = email) do
+    options
+    |> Enum.map(&send_option/1)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.into(email)
+  end
 
-  defp custom_var({:attachments, attachments}), do: %{"attachments" => attachments}
-  defp custom_var({:channel, channel}), do: %{"channel" => channel}
-  defp custom_var({:data_source, data_source}), do: %{"dataSource" => data_source}
-  defp custom_var({:encoding_type, encoding_type}), do: %{"encodingType" => encoding_type}
-  defp custom_var({:lists, lists}), do: %{"lists" => lists}
-  defp custom_var({:merge, merge}), do: %{"merge" => merge}
-  defp custom_var({:pool_name, pool_name}), do: %{"poolName" => pool_name}
-  defp custom_var({:post_back, post_back}), do: %{"postBack" => post_back}
-  defp custom_var({:segments, segments}), do: %{"segments" => segments}
-  defp custom_var({:template, template}), do: %{"template" => template}
-  defp custom_var({:track_clicks, track_clicks}), do: %{"trackClicks" => track_clicks}
-  defp custom_var({:track_opens, track_opens}), do: %{"trackOpens" => track_opens}
+  defp put_elastic_send_options(email), do: email
 
-  defp custom_var({:charset_body_html, charset_body_html}),
-    do: %{"charsetBodyHtml" => charset_body_html}
+  defp send_option({:attachments, attachments}), do: {"attachments", attachments}
+  defp send_option({:channel, channel}), do: {"channel", channel}
+  defp send_option({:data_source, data_source}), do: {"dataSource", data_source}
+  defp send_option({:encoding_type, encoding_type}), do: {"encodingType", encoding_type}
+  defp send_option({:lists, lists}), do: {"lists", lists}
+  defp send_option({:merge, merge}), do: {"merge", merge}
+  defp send_option({:pool_name, pool_name}), do: {"poolName", pool_name}
+  defp send_option({:post_back, post_back}), do: {"postBack", post_back}
+  defp send_option({:segments, segments}), do: {"segments", segments}
+  defp send_option({:template, template}), do: {"template", template}
+  defp send_option({:track_clicks, track_clicks}), do: {"trackClicks", track_clicks}
+  defp send_option({:track_opens, track_opens}), do: {"trackOpens", track_opens}
 
-  defp custom_var({:charset_body_text, charset_body_text}),
-    do: %{"charsetBodyText" => charset_body_text}
+  defp send_option({:charset_body_html, charset_body_html}),
+    do: {"charsetBodyHtml", charset_body_html}
 
-  defp custom_var({:merge_source_filename, merge_source_filename}),
-    do: %{"mergeSourceFilename" => merge_source_filename}
+  defp send_option({:charset_body_text, charset_body_text}),
+    do: {"charsetBodyText", charset_body_text}
 
-  defp custom_var({:time_off_set_minutes, time_off_set_minutes}),
-    do: %{"timeOffSetMinutes" => time_off_set_minutes}
+  defp send_option({:merge_source_filename, merge_source_filename}),
+    do: {"mergeSourceFilename", merge_source_filename}
 
-  defp custom_var(_), do: nil
+  defp send_option({:time_off_set_minutes, time_off_set_minutes}),
+    do: {"timeOffSetMinutes", time_off_set_minutes}
+
+  defp send_option(_), do: nil
 
   defp put_headers(body, %Email{headers: headers}) do
     Enum.reduce(headers, body, fn {key, value}, acc ->
