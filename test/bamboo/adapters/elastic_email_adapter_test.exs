@@ -190,6 +190,21 @@ defmodule Bamboo.ElasticEmailAdapterTest do
       refute params["unknown"]
     end
 
+    test "deliver/2 rejects custom elastic fields with nil value" do
+      email =
+        Email.put_private(new_email(), :elastic_send_options, %{
+          post_back: "12345",
+          pool_name: nil
+        })
+
+      ElasticEmailAdapter.deliver(email, @config)
+
+      assert_receive {:fake_elastic_email, %{params: params}}
+
+      assert params["postBack"] == "12345"
+      refute params["poolName"]
+    end
+
     test "deliver/2 adds custom elastic fields using deprecated :elastic_custom_vars" do
       email =
         Email.put_private(new_email(), :elastic_custom_vars, %{

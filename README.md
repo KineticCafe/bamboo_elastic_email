@@ -38,8 +38,9 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
 
 4.  Follow the Bamboo [Getting Started Guide][getting_started].
 
-5.  To use [ElasticEmail's API parameters][email_send] you can place a value in
-    the `Email#private` parameter:
+5.  To use [Elastic Email's API parameters][email_send] that are not automatically
+      handled by this plug-in natively, you can place a value in the `Email#private`
+      parameter:
 
     ```elixir
     Email.put_private(email, :elastic_send_options, %{post_back: "your-post-back-value", pool_name: "your-pool-name"})

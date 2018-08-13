@@ -209,7 +209,7 @@ defmodule Bamboo.ElasticEmailAdapter do
   defp put_elastic_send_options(%{private: %{elastic_send_options: options}} = email) do
     options
     |> Enum.map(&send_option/1)
-    |> Enum.reject(&is_nil/1)
+    |> Enum.reject(&is_nil(&1) || match?({_, nil}, &1))
     |> Enum.into(email)
   end
 
