@@ -38,12 +38,30 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
 
 4.  Follow the Bamboo [Getting Started Guide][getting_started].
 
-5.  To use ElasticEmail's [postBack][] functionality you can place a value in
+5.  To use [ElasticEmail's additional api params][email_send] you can place a value in
     the `Email#private` parameter:
 
     ```elixir
-    Email.put_private(email, :elastic_custom_vars, %{post_back: "your-post-back-value"})
+    Email.put_private(email, :elastic_custom_vars, %{post_back: "your-post-back-value", pool_name: "your-pool-name"})
     ```
+
+    Supported parameters are:
+      * :attachments
+      * :channel
+      * :charset_body_html
+      * :charset_body_text
+      * :data_source
+      * :encoding_type
+      * :lists
+      * :merge
+      * :merge_source_filename
+      * :pool_name
+      * :post_back
+      * :segments
+      * :template
+      * :time_off_set_minutes
+      * :track_clicks
+      * :track_opens
 
 ## Community and Contributing
 
@@ -60,4 +78,4 @@ Kinetic Cafe [open source projects][], is under the Kinetic Cafe Open Source
 [Contributing.md]: Contributing.md
 [open source projects]: https://github.com/KineticCafe
 [kccoc]: https://github.com/KineticCafe/code-of-conduct
-[postBack]: https://api.elasticemail.com/public/help#Email_Send
+[email_send]: https://api.elasticemail.com/public/help#Email_Send
