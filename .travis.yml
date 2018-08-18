@@ -1,9 +1,9 @@
 language: elixir
 elixir:
-  - 1.3
   - 1.4
   - 1.5
   - 1.6
+  - 1.7
 otp_release:
   - 18.3
   - 19.3
@@ -14,13 +14,11 @@ before_script:
   - mix deps.get --no-archives-check
 matrix:
   exclude:
-    - otp_release: 20.3
-      elixir: 1.3
-    - otp_release: 21.0
-      elixir: 1.3
     - otp_release: 21.0
       elixir: 1.4
     - otp_release: 21.0
       elixir: 1.5
     - otp_release: 18.3
       elixir: 1.6
+    - otp_release: 18.3
+      elixir: 1.7

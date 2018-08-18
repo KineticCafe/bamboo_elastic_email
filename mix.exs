@@ -8,7 +8,7 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
     [
       app: :bamboo_elastic_email,
       version: @version,
-      elixir: "~> 1.3",
+      elixir: "~> 1.4",
       source_url: @project_url,
       homepage_url: @project_url,
       name: "Bamboo Elastic Email Adapter",

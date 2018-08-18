@@ -18,16 +18,7 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
     end
     ```
 
-2.  If using Elixir before 1.4, or if you are managing all applications
-    yourself, ensure that `bamboo` is started before your application:
-
-    ```elixir
-    def application do
-      [applications: [:bamboo]]
-    end
-    ```
-
-3.  Add your Elastic Email API key to your config:
+2.  Add your Elastic Email API key to your config:
 
     ```elixir
     # In your config/config.exs file
@@ -36,9 +27,9 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
       api_key: "my-api-key"
     ```
 
-4.  Follow the Bamboo [Getting Started Guide][getting_started].
+3.  Follow the Bamboo [Getting Started Guide][getting_started].
 
-5.  To use [Elastic Email's API parameters][email_send] that are not automatically
+4.  To use [Elastic Email's API parameters][email_send] that are not automatically
       handled by this plug-in natively, you can place a value in the `Email#private`
       parameter:
 
