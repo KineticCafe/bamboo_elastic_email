@@ -145,7 +145,7 @@ defmodule Bamboo.ElasticEmailAdapter do
     |> put_charset()
     |> put_headers(email)
     |> put_api_key(api_key)
-    |> put_post_back()
+    |> put_elastic_send_options()
     |> put_transactional()
     |> transform_fields()
     |> filter_fields()
@@ -197,10 +197,50 @@ defmodule Bamboo.ElasticEmailAdapter do
 
   defp put_transactional(map), do: Map.put(map, "isTransactional", true)
 
-  defp put_post_back(%{private: %{elastic_custom_vars: %{post_back: post_back}}} = map),
-    do: Map.put(map, "postBack", post_back)
+  defp put_elastic_send_options(%{private: %{elastic_custom_vars: options} = private} = email) do
+    private =
+      private
+      |> Map.delete(:elastic_custom_vars)
+      |> Map.put(:elastic_send_options, options)
 
-  defp put_post_back(map), do: map
+    put_elastic_send_options(%{email | private: private})
+  end
+
+  defp put_elastic_send_options(%{private: %{elastic_send_options: options}} = email) do
+    options
+    |> Enum.map(&send_option/1)
+    |> Enum.reject(&is_nil(&1) || match?({_, nil}, &1))
+    |> Enum.into(email)
+  end
+
+  defp put_elastic_send_options(email), do: email
+
+  defp send_option({:attachments, attachments}), do: {"attachments", attachments}
+  defp send_option({:channel, channel}), do: {"channel", channel}
+  defp send_option({:data_source, data_source}), do: {"dataSource", data_source}
+  defp send_option({:encoding_type, encoding_type}), do: {"encodingType", encoding_type}
+  defp send_option({:lists, lists}), do: {"lists", lists}
+  defp send_option({:merge, merge}), do: {"merge", merge}
+  defp send_option({:pool_name, pool_name}), do: {"poolName", pool_name}
+  defp send_option({:post_back, post_back}), do: {"postBack", post_back}
+  defp send_option({:segments, segments}), do: {"segments", segments}
+  defp send_option({:template, template}), do: {"template", template}
+  defp send_option({:track_clicks, track_clicks}), do: {"trackClicks", track_clicks}
+  defp send_option({:track_opens, track_opens}), do: {"trackOpens", track_opens}
+
+  defp send_option({:charset_body_html, charset_body_html}),
+    do: {"charsetBodyHtml", charset_body_html}
+
+  defp send_option({:charset_body_text, charset_body_text}),
+    do: {"charsetBodyText", charset_body_text}
+
+  defp send_option({:merge_source_filename, merge_source_filename}),
+    do: {"mergeSourceFilename", merge_source_filename}
+
+  defp send_option({:time_off_set_minutes, time_off_set_minutes}),
+    do: {"timeOffSetMinutes", time_off_set_minutes}
+
+  defp send_option(_), do: nil
 
   defp put_headers(body, %Email{headers: headers}) do
     Enum.reduce(headers, body, fn {key, value}, acc ->
@@ -222,20 +262,35 @@ defmodule Bamboo.ElasticEmailAdapter do
   defp combine_name_and_email({name, email}), do: "#{name} <#{email}>"
 
   @message_fields [
+    :apikey,
+    :attachments,
+    :bodyHtml,
+    :bodyText,
+    :channel,
+    :charset,
+    :charsetBodyHtml,
+    :charsetBodyText,
+    :dataSource,
+    :encodingType,
     :from,
     :fromName,
+    :isTransactional,
+    :lists,
+    :merge,
+    :mergeSourceFilename,
     :msgTo,
     :msgCc,
     :msgBcc,
-    :subject,
-    :bodyHtml,
-    :bodyText,
-    :apikey,
-    :charset,
-    :isTransactional,
+    :poolName,
     :postBack,
     :replyTo,
-    :replyToName
+    :replyToName,
+    :segments,
+    :subject,
+    :template,
+    :timeOffSetMinutes,
+    :trackClicks,
+    :trackOpens
   ]
 
   @message_fields ~w(subject)a
