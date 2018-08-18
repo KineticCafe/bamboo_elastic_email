@@ -10,7 +10,8 @@ otp_release:
   - 20.3
   - 21.0
 before_script:
-  - mix deps.update poison
+  - mix deps.clean poison --unlock
+  - mix deps.get --no-archives-check
 matrix:
   exclude:
     - otp_release: 20.3

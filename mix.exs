@@ -53,7 +53,7 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
 
   defp deps do
     [
-      {:bamboo, ">= 0.8.0 or < 2.0.0"},
+      {:bamboo, ">= 0.8.0 and < 2.0.0"},
       {:plug, "~> 1.0"},
       {:hackney, "~> 1.6"},
       poison_dep(Version.compare(System.version(), "1.6.0-rc1")),
@@ -64,6 +64,6 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
     ]
   end
 
-  defp poison_dep(:lt), do: {:poison, ">= 1.5.0 or < 4.0.0"}
+  defp poison_dep(:lt), do: {:poison, ">= 1.5.0 and < 4.0.0"}
   defp poison_dep(_), do: {:poison, "~> 4.0"}
 end
