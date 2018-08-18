@@ -1,9 +1,14 @@
 # Changelog
 
+## 1.0.0
+
+* Jonathan Principe extended the postBack functionality into support for all
+  previously unsupported ElasticEmail send parameters.
+
 ## 0.2.0
 
 * Updated dependencies to support Bamboo 1.0
-* Added support for ElasticEmail postBack functionality.
+* Jonathan Principe added support for ElasticEmail postBack functionality.
 
 ## 0.1.0
 

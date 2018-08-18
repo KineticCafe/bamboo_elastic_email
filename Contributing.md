@@ -35,7 +35,8 @@ Here's the most direct way to get your work merged into the project:
 
 *   Austin Ziegler created bamboo\_elastic\_email, based in part on
     [bamboo\_sparkpost][] by Andrew Timberlake.
-*   Jonathan Principe upgraded to support Bamboo 1.0 and added support for all ElasticEmail send parameters
+*   Jonathan Principe upgraded to support Bamboo 1.0 and added support for all
+    ElasticEmail send parameters
 
 [quality commit messages]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 [Credo]: https://github.com/rrrene/credo

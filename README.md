@@ -11,8 +11,8 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
     ```elixir
     def deps do
       [
-        {:bamboo, "~> 0.8"},
-        {:bamboo_elastic_email, "~> 0.1"}
+        {:bamboo, "~> 1.0"},
+        {:bamboo_elastic_email, "~> 1.0"}
         # OR: {:bamboo_elastic_email, github: "KineticCafe/bamboo_elastic_email"}
       ]
     end
@@ -63,6 +63,11 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
       * :time_off_set_minutes
       * :track_clicks
       * :track_opens
+
+### A note on Bamboo compatibility
+
+The examples here use the recently release Bamboo 1.0 as an example, but
+`bamboo_elastic_email` is compatible with Bamboo 0.8 or Bamboo 1.0.
 
 ## Community and Contributing
 
