@@ -9,6 +9,8 @@ otp_release:
   - 19.3
   - 20.3
   - 21.0
+before_script:
+  - mix deps.update poison
 matrix:
   exclude:
     - otp_release: 20.3
