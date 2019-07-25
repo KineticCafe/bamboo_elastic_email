@@ -2,7 +2,7 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
   use Mix.Project
 
   @project_url "https://github.com/KineticCafe/bamboo_elastic_email"
-  @version "1.1.0"
+  @version "1.1.1"
 
   def project do
     [
@@ -66,7 +66,7 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
   end
 
   defp poison_dep(:lt), do: {:poison, ">= 1.5.0 and < 4.0.0", optional: true}
-  defp poison_dep(_), do: {:poison, "~> 4.0", optional: true}
+  defp poison_dep(_), do: {:poison, "~> 2.0 or ~3.0 or ~> 4.0", optional: true}
 
   defp ex_doc_dep(:lt), do: {:ex_doc, "~> 0.18.0", only: :dev, runtime: false}
   defp ex_doc_dep(_), do: {:ex_doc, "~> 0.19", only: :dev, runtime: false}
