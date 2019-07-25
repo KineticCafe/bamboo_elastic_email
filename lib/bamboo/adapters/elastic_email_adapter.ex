@@ -2,8 +2,8 @@ defmodule Bamboo.ElasticEmailAdapter do
   @moduledoc """
   Sends email using ElasticEmail's JSON API.
 
-  Use this adapter to send emails through ElasticEmail's API. Requires that an API
-  key is set in the config.
+  Use this adapter to send emails through ElasticEmail's API. Requires that an
+  API key is set in the config.
 
   This version is extracted from a hastily-constructed adapter for a Kinetic
   Commerce project. It makes several assumptions that will be broken in a
@@ -41,9 +41,7 @@ defmodule Bamboo.ElasticEmailAdapter do
 
     defexception [:message]
 
-    @spec exception(%{message: String.t()}) :: Exception.t()
-    @spec exception(%{params: map, response: any}) :: Exception.t()
-
+    @spec exception(%{message: String.t()} | %{params: any, response: any}) :: Exception.t()
     def exception(%{message: message}), do: %ApiError{message: message}
 
     def exception(%{params: params, response: response}) do
@@ -209,7 +207,7 @@ defmodule Bamboo.ElasticEmailAdapter do
   defp put_elastic_send_options(%{private: %{elastic_send_options: options}} = email) do
     options
     |> Enum.map(&send_option/1)
-    |> Enum.reject(&is_nil(&1) || match?({_, nil}, &1))
+    |> Enum.reject(&(is_nil(&1) || match?({_, nil}, &1)))
     |> Enum.into(email)
   end
 
@@ -261,47 +259,17 @@ defmodule Bamboo.ElasticEmailAdapter do
   defp combine_name_and_email({"", email}), do: email
   defp combine_name_and_email({name, email}), do: "#{name} <#{email}>"
 
-  @message_fields [
-    :apikey,
-    :attachments,
-    :bodyHtml,
-    :bodyText,
-    :channel,
-    :charset,
-    :charsetBodyHtml,
-    :charsetBodyText,
-    :dataSource,
-    :encodingType,
-    :from,
-    :fromName,
-    :isTransactional,
-    :lists,
-    :merge,
-    :mergeSourceFilename,
-    :msgTo,
-    :msgCc,
-    :msgBcc,
-    :poolName,
-    :postBack,
-    :replyTo,
-    :replyToName,
-    :segments,
-    :subject,
-    :template,
-    :timeOffSetMinutes,
-    :trackClicks,
-    :trackOpens
-  ]
-
   @message_fields ~w(subject)a
 
   defp transform_fields(map) do
     Enum.reduce(@message_fields, map, &transform_field/2)
   end
 
-  defp transform_field(field, map) do
+  defp transform_field(field, map) when is_atom(field) do
     Map.put(map, Atom.to_string(field), Map.get(map, field))
   end
+
+  defp transform_field(_field, map), do: map
 
   defp filter_fields(map) do
     Enum.reject(map, &(is_atom(elem(&1, 0)) or elem(&1, 1) in [nil, "", []]))

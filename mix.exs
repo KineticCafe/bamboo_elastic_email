@@ -2,7 +2,7 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
   use Mix.Project
 
   @project_url "https://github.com/KineticCafe/bamboo_elastic_email"
-  @version "1.0.0"
+  @version "1.1.0"
 
   def project do
     [
@@ -58,12 +58,16 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
       {:hackney, "~> 1.6"},
       poison_dep(Version.compare(System.version(), "1.6.0-rc1")),
       {:cowboy, "~> 1.0", only: [:dev, :test]},
-      {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.18", only: :dev, runtime: false}
+      {:plug_cowboy, "~> 1.0 or ~> 2.0", only: [:dev, :test]},
+      {:credo, "~> 1.0", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
+      ex_doc_dep(Version.compare(System.version(), "1.7.0"))
     ]
   end
 
-  defp poison_dep(:lt), do: {:poison, ">= 1.5.0 and < 4.0.0"}
-  defp poison_dep(_), do: {:poison, "~> 4.0"}
+  defp poison_dep(:lt), do: {:poison, ">= 1.5.0 and < 4.0.0", optional: true}
+  defp poison_dep(_), do: {:poison, "~> 4.0", optional: true}
+
+  defp ex_doc_dep(:lt), do: {:ex_doc, "~> 0.18.0", only: :dev, runtime: false}
+  defp ex_doc_dep(_), do: {:ex_doc, "~> 0.19", only: :dev, runtime: false}
 end

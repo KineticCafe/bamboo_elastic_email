@@ -12,7 +12,7 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
     def deps do
       [
         {:bamboo, "~> 1.0"},
-        {:bamboo_elastic_email, "~> 1.0"}
+        {:bamboo_elastic_email, "~> 1.1"}
         # OR: {:bamboo_elastic_email, github: "KineticCafe/bamboo_elastic_email"}
       ]
     end
