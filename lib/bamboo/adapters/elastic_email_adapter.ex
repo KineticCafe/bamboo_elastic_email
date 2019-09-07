@@ -36,7 +36,7 @@ defmodule Bamboo.ElasticEmailAdapter do
   alias Bamboo.Email
   alias Plug.Conn.Query
 
-  def supports_attachments, do: true
+  def supports_attachments?, do: true
 
   defmodule ApiError do
     @moduledoc false
