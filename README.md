@@ -6,40 +6,49 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
 
 ## Installation
 
-1.  Add `bamboo` and `bamboo_elastic_email` to your `mix.exs`:
+1. Add `bamboo` and `bamboo_elastic_email` to your `mix.exs`:
+
+   ```elixir
+   def deps do
+     [
+       {:bamboo, "~> 1.0"},
+       {:bamboo_elastic_email, "~> 1.2"}
+       # OR: {:bamboo_elastic_email, github: "KineticCafe/bamboo_elastic_email"}
+     ]
+   end
+   ```
+
+2. Add your Elastic Email API key to your config:
+
+   ```elixir
+   # In your config/config.exs file
+   config :my_app, MyApp.Mailer,
+     adapter: Bamboo.ElasticEmailAdapter
+     api_key: "my-api-key"
+   ```
+
+3. Follow the Bamboo [Getting Started Guide][getting_started].
+
+4. To use [Elastic Email's API parameters][email_send] that are not
+   automatically handled by this plug-in natively, you can place a value in
+   the `Email#private` parameter:
 
     ```elixir
-    def deps do
-      [
-        {:bamboo, "~> 1.0"},
-        {:bamboo_elastic_email, "~> 1.1"}
-        # OR: {:bamboo_elastic_email, github: "KineticCafe/bamboo_elastic_email"}
-      ]
-    end
+    Email.put_private(
+      email,
+      :elastic_send_options,
+      %{post_back: "your-post-back-value", pool_name: "your-pool-name"}
+    )
     ```
 
-2.  Add your Elastic Email API key to your config:
-
-    ```elixir
-    # In your config/config.exs file
-    config :my_app, MyApp.Mailer,
-      adapter: Bamboo.ElasticEmailAdapter
-      api_key: "my-api-key"
-    ```
-
-3.  Follow the Bamboo [Getting Started Guide][getting_started].
-
-4.  To use [Elastic Email's API parameters][email_send] that are not automatically
-      handled by this plug-in natively, you can place a value in the `Email#private`
-      parameter:
-
-    ```elixir
-    Email.put_private(email, :elastic_send_options, %{post_back: "your-post-back-value", pool_name: "your-pool-name"})
-    ```
+    As of version 1.2, this can also be done with the helpers in the
+    `Bamboo.ElasticEmail` module.
 
     Supported parameters are:
       * :attachments
       * :channel
+      * :charset
+      * :charset_body_amp
       * :charset_body_html
       * :charset_body_text
       * :data_source
@@ -54,10 +63,14 @@ An [Elastic Email][] adapter for the [Bamboo][] email app for Elixir.
       * :time_off_set_minutes
       * :track_clicks
       * :track_opens
+      * :utm_campaign
+      * :utm_content
+      * :utm_medium
+      * :utm_source
 
 ### A note on Bamboo compatibility
 
-The examples here use the recently release Bamboo 1.0 as an example, but
+The examples here use the Bamboo 1.0 API as an example, but
 `bamboo_elastic_email` is compatible with Bamboo 0.8 or Bamboo 1.0.
 
 ## Community and Contributing
