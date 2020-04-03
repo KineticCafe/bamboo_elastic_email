@@ -33,9 +33,13 @@ defmodule Bamboo.ElasticEmailAdapter do
   @send_message_path "/email/send"
   @hackney_opts [:with_body, ssl_options: [versions: [:"tlsv1.2"]]]
 
-  alias Bamboo.Email
-  alias Plug.Conn.Query
+  alias Bamboo.{
+    Email,
+    ElasticEmail.Utilities
+  }
 
+  @doc false
+  @impl Bamboo.Adapter
   def supports_attachments?, do: true
 
   defmodule ApiError do
@@ -49,7 +53,7 @@ defmodule Bamboo.ElasticEmailAdapter do
     def exception(%{params: params, response: response}) do
       filtered_params =
         params
-        |> Query.decode()
+        |> Utilities.decode_query()
         |> Map.put("apikey", "[FILTERED]")
 
       message = """
@@ -64,7 +68,7 @@ defmodule Bamboo.ElasticEmailAdapter do
       #{inspect(filtered_params, limit: :infinity)}
       """
 
-      %ApiError{message: message}
+      exception(%{message: message})
     end
   end
 
@@ -77,7 +81,7 @@ defmodule Bamboo.ElasticEmailAdapter do
     body =
       email
       |> to_elastic_body(api_key)
-      |> Query.encode()
+      |> Utilities.encode_query()
 
     case request!(@send_message_path, body, api_key) do
       {:ok, status, _headers, response} when status > 299 ->
@@ -148,6 +152,7 @@ defmodule Bamboo.ElasticEmailAdapter do
     |> put_elastic_send_options()
     |> put_transactional()
     |> transform_fields()
+    |> handle_merge()
     |> filter_fields()
   end
 
@@ -217,6 +222,7 @@ defmodule Bamboo.ElasticEmailAdapter do
 
   defp send_option({:attachments, attachments}), do: {"attachments", attachments}
   defp send_option({:channel, channel}), do: {"channel", channel}
+  defp send_option({:charset, charset}), do: {"charset", charset}
   defp send_option({:data_source, data_source}), do: {"dataSource", data_source}
   defp send_option({:encoding_type, encoding_type}), do: {"encodingType", encoding_type}
   defp send_option({:lists, lists}), do: {"lists", lists}
@@ -227,6 +233,13 @@ defmodule Bamboo.ElasticEmailAdapter do
   defp send_option({:template, template}), do: {"template", template}
   defp send_option({:track_clicks, track_clicks}), do: {"trackClicks", track_clicks}
   defp send_option({:track_opens, track_opens}), do: {"trackOpens", track_opens}
+  defp send_option({:utm_campaign, utm_campaign}), do: {"utmCampaign", utm_campaign}
+  defp send_option({:utm_content, utm_content}), do: {"utmCampaign", utm_content}
+  defp send_option({:utm_medium, utm_medium}), do: {"utmCampaign", utm_medium}
+  defp send_option({:utm_source, utm_source}), do: {"utmCampaign", utm_source}
+
+  defp send_option({:charset_body_amp, charset_body_amp}),
+    do: {"charsetBodyAmp", charset_body_amp}
 
   defp send_option({:charset_body_html, charset_body_html}),
     do: {"charsetBodyHtml", charset_body_html}
@@ -275,6 +288,20 @@ defmodule Bamboo.ElasticEmailAdapter do
 
   defp filter_fields(map) do
     Enum.reject(map, &(is_atom(elem(&1, 0)) or elem(&1, 1) in [nil, "", []]))
+  end
+
+  defp handle_merge(map) do
+    map
+    |> Map.pop("merge")
+    |> case do
+      {nil, _} ->
+        map
+
+      {merge, map} ->
+        map
+        |> Enum.to_list()
+        |> Enum.concat(merge)
+    end
   end
 
   defp base_uri do

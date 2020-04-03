@@ -1,8 +1,10 @@
 defmodule Bamboo.ElasticEmailAdapter.Mixfile do
+  @moduledoc false
+
   use Mix.Project
 
   @project_url "https://github.com/KineticCafe/bamboo_elastic_email"
-  @version "1.1.1"
+  @version "1.2.0"
 
   def project do
     [
@@ -16,6 +18,7 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       package: package(),
+      elixirc_paths: elixirc_paths(Mix.env()),
       dialyzer: [
         plt_apps: [:dialyzer, :elixir, :kernel, :mix, :stdlib],
         ignore_warnings: ".dialyzer_ignore",
@@ -29,6 +32,10 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
   def application do
     [applications: [:logger, :bamboo]]
   end
+
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp package do
     [

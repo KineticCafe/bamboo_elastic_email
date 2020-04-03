@@ -1,65 +1,19 @@
 defmodule Bamboo.ElasticEmailAdapterTest do
+  @moduledoc false
+
   use ExUnit.Case
-  alias Bamboo.ElasticEmailAdapter
-  alias Bamboo.Email
-  alias Bamboo.Mailer
-  alias Plug.Adapters.Cowboy
+
+  alias Bamboo.{
+    ElasticEmail,
+    ElasticEmailAdapter,
+    Email,
+    Mailer
+  }
+
   alias Plug.Conn
 
   @config %{adapter: ElasticEmailAdapter, api_key: "123_abc"}
   @config_with_bad_key %{adapter: ElasticEmailAdapter, api_key: nil}
-
-  defmodule FakeElasticEmail do
-    use Plug.Router
-
-    plug Plug.Parsers,
-      parsers: [:urlencoded, :multipart, :json],
-      pass: ["*/*"],
-      json_decoder: Poison
-
-    plug :match
-    plug :dispatch
-
-    def start_server(parent) do
-      Agent.start_link(fn -> Map.new() end, name: __MODULE__)
-      Agent.update(__MODULE__, &Map.put(&1, :parent, parent))
-      port = get_free_port()
-
-      Application.put_env(:bamboo, :elastic_email_base_uri, "http://localhost:#{port}")
-      Cowboy.http(__MODULE__, [], port: port, ref: __MODULE__)
-    end
-
-    def get_free_port do
-      {:ok, socket} = :ranch_tcp.listen(port: 0)
-      {:ok, port} = :inet.port(socket)
-      :erlang.port_close(socket)
-      port
-    end
-
-    def shutdown do
-      Cowboy.shutdown(__MODULE__)
-    end
-
-    post "/email/send" do
-      case conn.params["from"] do
-        "INVALID_EMAIL" ->
-          conn
-          |> send_resp(500, "Error!!")
-          |> send_to_parent
-
-        _ ->
-          conn
-          |> send_resp(200, "SENT")
-          |> send_to_parent
-      end
-    end
-
-    defp send_to_parent(conn) do
-      parent = Agent.get(__MODULE__, &Map.get(&1, :parent))
-      send(parent, {:fake_elastic_email, conn})
-      conn
-    end
-  end
 
   test "raises if the api key is nil" do
     assert_raise ArgumentError, ~r/no API key set/, fn ->
@@ -109,12 +63,15 @@ defmodule Bamboo.ElasticEmailAdapterTest do
 
       assert Conn.get_req_header(conn, "content-type") == ["application/x-www-form-urlencoded"]
 
-      assert params["apikey"] == @config[:api_key]
-      assert {params["fromName"], params["from"]} == email.from
-      assert params["subject"] == email.subject
-      assert params["bodyText"] == email.text_body
-      assert params["bodyHtml"] == email.html_body
-      assert params["replyTo"] == "reply@foo.com"
+      assert params["apikey"] == [@config[:api_key]]
+
+      assert {params["fromName"], params["from"]} ==
+               {[elem(email.from, 0)], [elem(email.from, 1)]}
+
+      assert params["subject"] == [email.subject]
+      assert params["bodyText"] == [email.text_body]
+      assert params["bodyHtml"] == [email.html_body]
+      assert params["replyTo"] == ["reply@foo.com"]
 
       assert not Enum.any?(Map.keys(params), &String.starts_with?(&1, "header_"))
     end
@@ -131,9 +88,9 @@ defmodule Bamboo.ElasticEmailAdapterTest do
 
       assert_receive {:fake_elastic_email, %{params: params}}
 
-      assert "To <to@bar.com>;To2 <to2@bar.com>" == params["msgTo"]
-      assert "CC <cc@bar.com>" == params["msgCc"]
-      assert "BCC <bcc@bar.com>" == params["msgBcc"]
+      assert ["To <to@bar.com>;To2 <to2@bar.com>"] == params["msgTo"]
+      assert ["CC <cc@bar.com>"] == params["msgCc"]
+      assert ["BCC <bcc@bar.com>"] == params["msgBcc"]
     end
 
     test "deliver/2 adds extra params to the message " do
@@ -141,7 +98,7 @@ defmodule Bamboo.ElasticEmailAdapterTest do
 
       assert_receive {:fake_elastic_email, %{params: params}}
 
-      assert params["isTransactional"] == "true"
+      assert params["isTransactional"] == ["true"]
     end
 
     test "raises if the response is not a success" do
@@ -171,8 +128,18 @@ defmodule Bamboo.ElasticEmailAdapterTest do
 
       assert_receive {:fake_elastic_email, %{params: params}}
 
-      assert params["postBack"] == "12345"
-      assert params["poolName"] == "test"
+      assert params["postBack"] == ["12345"]
+      assert params["poolName"] == ["test"]
+    end
+
+    test "deliver/2 handles the merge custom elastic field correctly" do
+      email = ElasticEmail.merge(new_email(), first_name: ["Chris", "George"])
+
+      ElasticEmailAdapter.deliver(email, @config)
+
+      assert_receive {:fake_elastic_email, %{params: params}}
+
+      assert params["merge_first_name"] == ["Chris", "George"]
     end
 
     test "deliver/2 skips unknown custom elastic fields from email to the message" do
@@ -186,8 +153,29 @@ defmodule Bamboo.ElasticEmailAdapterTest do
 
       assert_receive {:fake_elastic_email, %{params: params}}
 
-      assert params["poolName"] == "test"
+      assert params["poolName"] == ["test"]
       refute params["unknown"]
+    end
+
+    test "deliver/2 handles charset settings correctly" do
+      [nil, :amp, :html, :text]
+      |> Enum.each(fn type ->
+        new_email()
+        |> ElasticEmail.charset(type, "iso-8859-1")
+        |> ElasticEmailAdapter.deliver(@config)
+
+        assert_receive {:fake_elastic_email, %{params: params}}
+
+        type =
+          case type do
+            nil -> "charset"
+            :amp -> "charsetBodyAmp"
+            :html -> "charsetBodyHtml"
+            :text -> "charsetBodyText"
+          end
+
+        assert params[type] == ["iso-8859-1"]
+      end)
     end
 
     test "deliver/2 rejects custom elastic fields with nil value" do
@@ -201,7 +189,7 @@ defmodule Bamboo.ElasticEmailAdapterTest do
 
       assert_receive {:fake_elastic_email, %{params: params}}
 
-      assert params["postBack"] == "12345"
+      assert params["postBack"] == ["12345"]
       refute params["poolName"]
     end
 
@@ -216,8 +204,8 @@ defmodule Bamboo.ElasticEmailAdapterTest do
 
       assert_receive {:fake_elastic_email, %{params: params}}
 
-      assert params["postBack"] == "12345"
-      assert params["poolName"] == "test"
+      assert params["postBack"] == ["12345"]
+      assert params["poolName"] == ["test"]
     end
 
     defp new_email(attrs \\ []) do

@@ -1,24 +1,29 @@
 language: elixir
 elixir:
-  - 1.4
-  - 1.5
-  - 1.6
-  - 1.7
+  - "1.7.4"
+  - "1.8.2"
+  - "1.9.4"
+  - "1.10.2"
 otp_release:
-  - 18.3
-  - 19.3
-  - 20.3
-  - 21.0
+  - "19.3"
+  - "20.3"
+  - "21.0"
+  - "21.1"
+  - "21.2"
+  - "21.3"
+  - "22.0"
+  - "22.1"
+  - "22.2"
 before_script:
   - mix deps.clean poison --unlock
   - mix deps.get --no-archives-check
 matrix:
   exclude:
-    - otp_release: 21.0
-      elixir: 1.4
-    - otp_release: 21.0
-      elixir: 1.5
-    - otp_release: 18.3
-      elixir: 1.6
-    - otp_release: 18.3
-      elixir: 1.7
+    - otp_release: "19.3"
+      elixir: "1.8.2"
+    - otp_release: "19.3"
+      elixir: "1.9.4"
+    - otp_release: "19.3"
+      elixir: "1.10.2"
+    - otp_release: "20.3"
+      elixir: "1.10.2"
