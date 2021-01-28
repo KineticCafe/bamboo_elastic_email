@@ -30,7 +30,7 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :bamboo]]
+    [extra_applications: [:logger, :bamboo]]
   end
 
   # Specifies which paths to compile per environment.
