@@ -20,9 +20,7 @@ defmodule Bamboo.ElasticEmailAdapter.Mixfile do
       package: package(),
       elixirc_paths: elixirc_paths(Mix.env()),
       dialyzer: [
-        plt_apps: [:dialyzer, :elixir, :kernel, :mix, :stdlib],
-        ignore_warnings: ".dialyzer_ignore",
-        flags: [:unmatched_returns, :error_handling, :underspecs]
+        plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
       ],
       deps: deps(),
       docs: docs()
