@@ -234,9 +234,9 @@ defmodule Bamboo.ElasticEmailAdapter do
   defp send_option({:track_clicks, track_clicks}), do: {"trackClicks", track_clicks}
   defp send_option({:track_opens, track_opens}), do: {"trackOpens", track_opens}
   defp send_option({:utm_campaign, utm_campaign}), do: {"utmCampaign", utm_campaign}
-  defp send_option({:utm_content, utm_content}), do: {"utmCampaign", utm_content}
-  defp send_option({:utm_medium, utm_medium}), do: {"utmCampaign", utm_medium}
-  defp send_option({:utm_source, utm_source}), do: {"utmCampaign", utm_source}
+  defp send_option({:utm_content, utm_content}), do: {"utmContent", utm_content}
+  defp send_option({:utm_medium, utm_medium}), do: {"utmMedium", utm_medium}
+  defp send_option({:utm_source, utm_source}), do: {"utmSource", utm_source}
 
   defp send_option({:charset_body_amp, charset_body_amp}),
     do: {"charsetBodyAmp", charset_body_amp}
