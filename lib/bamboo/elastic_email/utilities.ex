@@ -163,10 +163,10 @@ defmodule Bamboo.ElasticEmail.Utilities do
 
       {field, value} when is_list(value) ->
         field = encode_key(field)
-        [?&, Enum.map(value, &[?&, field, ?= | encode_value(&1, encoder)])]
+        [?&, Enum.map(value, &[?&, field, ?=, encode_value(&1, encoder)])]
 
       {field, value} ->
-        [?& | [encode_key(field), ?=, encode_value(value, encoder)]]
+        [?&, [encode_key(field), ?=, encode_value(value, encoder)]]
     end
 
     kv
