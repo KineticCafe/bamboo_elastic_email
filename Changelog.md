@@ -5,6 +5,7 @@
 - Corrected some typos in support for UTM parameters.
 - Corrected the changelog.
 - Improved the GitHub Actions workflow.
+- Fixed a case where a list was improperly constructed.
 
 ## 1.2.0
 
